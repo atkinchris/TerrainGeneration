@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<title>Islands!</title>
+<body>
+	<script src='perlin.js'></script>
+	<script src='chunk.js'></script>
+	<script src='pixi.dev.js'></script>
+	<style>
+		table {
+			border-collapse: collapse;
+		}
+		th, td {
+			padding: 0;
+			width: 4px;
+			height: 4px;
+		}
+	</style>
+
+	<table>
+		<script>
+			var seaLevel = 32;
+			var mtnLevel = 128;
+			
+			pixiGo();
+
+			function printChunk(chunk) {
+				var output = "";
+
+				for ( var y = 0; y < chunk.length; y++ ) {
+					output += "<tr" + ">";
+					for ( var x = 0; x < chunk.length; x++ ) {
+						var colour = "FFFFFF";
+						var value = chunk[y][x];
+
+						if ( value < seaLevel * 0.6 ) {
+							colour = "0000CC";
+						} else if ( value < seaLevel ) {
+							colour = "0000FF";
+						} else if ( value < seaLevel + 10 ) {
+							colour = "FFF000";
+						} else if ( value > mtnLevel ) {
+							colour = "EEEEEE";
+						} else {
+							colour = "00FF00";
+						}
+
+						output += "<td bgcolor=\"#" + colour + "\"></td>";
+					};
+					output += "</tr" + ">";
+				};
+
+				document.write(output);
+			}
+		</script>
+	</table>
+</body>
