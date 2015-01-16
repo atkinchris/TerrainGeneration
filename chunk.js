@@ -1,11 +1,11 @@
-var seed = hashCode( "Chris" );
+var seed = hashCode( "" );
 noise.seed( seed );
 
 var parameters = {
 	octaves: 8,
-	roughness: 0.4,
-	zoom: 256,
-	rounding: 1
+	roughness: 4,
+	zoom: 32,
+	rounding: 32
 }
 
 function getChunk( x, y ) {
@@ -32,13 +32,22 @@ function getValue( x, y ) {
 
 	for ( var i = 0; i < parameters.octaves; i++ ) {
 		var frequency = Math.pow( 2, i );
-		var amplitude = Math.pow( parameters.roughness, i );
-		value = value + noise.perlin2( x * frequency, y * frequency ) * amplitude;
+		var amplitude = Math.pow( parameters.roughness / 10, i );
+		if ( i > 5 ) {
+			value += noise.simplex2( x * frequency, y * frequency ) * amplitude;
+		} else {
+			value += noise.perlin2( x * frequency, y * frequency ) * amplitude;
+		}
 	}
 
 	value = Math.abs( value );
-	value *= 256;
-	value = Math.round( value / parameters.rounding ) * parameters.rounding;
+	value *= 6;
+	// var round = parameters.rounding;
+	// if ( value < round * 1.7 && value > round / 4 ) {
+	// 	round /= 4;
+	// }
+	value = Math.round( value / 1 ) * 1;
+	//value = ~~value;
 	return value;
 }
 
@@ -50,9 +59,10 @@ function hashCode( str ) {
 	return hash;
 }
 
+
 function pixiGo() {
-	var chunksToLoad = 10;
-	var renderer = new PIXI.autoDetectRenderer( chunksToLoad * 16 * 8, chunksToLoad * 16 * 8 );
+	var chunksToLoad = 3;
+	var renderer = new PIXI.autoDetectRenderer( chunksToLoad * 16 * 16, chunksToLoad * 16 * 16 );
 
 	document.body.appendChild( renderer.view );
 
@@ -62,7 +72,8 @@ function pixiGo() {
 
 	for ( var iY = 0; iY < chunksToLoad; iY++ ) {
 		for ( var iX = 0; iX < chunksToLoad; iX++ ) {
-			base.addChildAt( generateChunkSprite( iX, iY ), 0 );
+			//base.addChild( generateChunkSprite( iX, iY ) );
+			generateChunkSprite( iX, iY, base );
 		};
 	};
 
@@ -70,25 +81,62 @@ function pixiGo() {
 	renderer.render( stage );
 }
 
-function generateChunkSprite( chunkI, chunkJ ) {
+function generateChunkSprite( chunkI, chunkJ, base ) {
 	var CHUNK_SIZE = 16;
 	var TILE_SIZE = 16;
-	var renderTexture = new PIXI.RenderTexture( CHUNK_SIZE * TILE_SIZE, CHUNK_SIZE * TILE_SIZE );
-	var chunkSprite = new PIXI.Sprite( renderTexture );
+	var chunkDOC = new PIXI.SpriteBatch();
 
-	chunkSprite.position.x = chunkI * CHUNK_SIZE * TILE_SIZE;
-	chunkSprite.position.y = chunkJ * CHUNK_SIZE * TILE_SIZE;
+	var renderTexture = new PIXI.RenderTexture( CHUNK_SIZE * TILE_SIZE, CHUNK_SIZE * TILE_SIZE );
+	var colours = getColourRange();
 
 	for ( var X = 0; X < CHUNK_SIZE; X++ ) {
 		for ( var Y = 0; Y < CHUNK_SIZE; Y++ ) {
 			var cell = getValue( chunkI * CHUNK_SIZE + X, chunkJ * CHUNK_SIZE + Y );
-			var graphics = new PIXI.Graphics();
-			graphics.beginFill( (cell * 2048) + 204800 );
-			graphics.drawRect( X * TILE_SIZE, Y * TILE_SIZE, TILE_SIZE, TILE_SIZE );
-			graphics.endFill();
-			renderTexture.render( graphics );
+			var type = "";
+			if ( cell < parameters.rounding ) {
+				type = "water";
+			} else if ( cell < parameters.rounding * 1.05 ) {
+				type = "sand";
+			} else {
+				type = "grass";
+			}
+			var sprite = PIXI.Sprite.fromImage( type + ".png" );
+			sprite.position.x = ( X * TILE_SIZE ) + ( chunkI * CHUNK_SIZE * TILE_SIZE );
+			sprite.position.y = ( Y * TILE_SIZE ) + ( chunkJ * CHUNK_SIZE * TILE_SIZE );
+			sprite.tint = colours[ ~~cell ];
+			base.addChild( sprite );
 		}
 	}
 
+	renderTexture.render( chunkDOC );
+	var chunkSprite = new PIXI.Sprite( renderTexture );
+	chunkSprite.position.x = chunkI * CHUNK_SIZE * TILE_SIZE;
+	chunkSprite.position.y = chunkJ * CHUNK_SIZE * TILE_SIZE;
 	return chunkSprite;
+};
+
+function getColourRange() {
+	var startColor = 0x333333;
+	var endColor = 0xFFFFFF;
+
+	var startRed = ( startColor >> 16 ) & 0xFF;
+	var startGreen = ( startColor >> 8 ) & 0xFF;
+	var startBlue = startColor & 0xFF;
+
+	var endRed = ( endColor >> 16 ) & 0xFF;
+	var endGreen = ( endColor >> 8 ) & 0xFF;
+	var endBlue = endColor & 0xFF;
+
+	var steps = 6;
+	var result = [];
+
+	for ( var i = 0; i < steps; i++ ) {
+		var newRed = ( ( steps - 1 - i ) * startRed + i * endRed ) / ( steps - 1 );
+		var newGreen = ( ( steps - 1 - i ) * startGreen + i * endGreen ) / ( steps - 1 );
+		var newBlue = ( ( steps - 1 - i ) * startBlue + i * endBlue ) / ( steps - 1 );
+		var comb = newRed << 16 | newGreen << 8 | newBlue;
+		result.push( comb );
+	}
+
+	return result;
 };
