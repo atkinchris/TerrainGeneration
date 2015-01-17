@@ -2,9 +2,9 @@ var seed = hashCode( "" );
 noise.seed( seed );
 
 var parameters = {
-	octaves: 8,
+	octaves: 1,
 	roughness: 4,
-	zoom: 32,
+	zoom: 64,
 	rounding: 32
 }
 
@@ -27,28 +27,30 @@ function getChunk( x, y ) {
 function getValue( x, y ) {
 	var value = 0;
 
+	x = Math.round( x / 4 ) * 4;
+	y = Math.round( y / 4 ) * 4;
+
 	x /= parameters.zoom;
 	y /= parameters.zoom;
 
 	for ( var i = 0; i < parameters.octaves; i++ ) {
 		var frequency = Math.pow( 2, i );
 		var amplitude = Math.pow( parameters.roughness / 10, i );
-		if ( i > 5 ) {
-			value += noise.simplex2( x * frequency, y * frequency ) * amplitude;
-		} else {
-			value += noise.perlin2( x * frequency, y * frequency ) * amplitude;
-		}
+
+		//value += noise.perlin2( x * frequency, y * frequency ) * amplitude;
+		value += noise.simplex2( x * frequency, y * frequency ) * amplitude;
 	}
 
 	value = Math.abs( value );
-	value *= 6;
-	// var round = parameters.rounding;
-	// if ( value < round * 1.7 && value > round / 4 ) {
-	// 	round /= 4;
-	// }
-	value = Math.round( value / 1 ) * 1;
-	//value = ~~value;
-	return value;
+	//value *= 8;
+
+	if (value >= 0.3) {
+		return 1;
+	} else {
+		return 0;
+	}
+
+	//return ~~value;
 }
 
 function hashCode( str ) {
@@ -61,8 +63,8 @@ function hashCode( str ) {
 
 
 function pixiGo() {
-	var chunksToLoad = 3;
-	var renderer = new PIXI.autoDetectRenderer( chunksToLoad * 16 * 16, chunksToLoad * 16 * 16 );
+	var chunksToLoad = 6;
+	var renderer = new PIXI.autoDetectRenderer( chunksToLoad * 8 * 16, chunksToLoad * 8 * 16 );
 
 	document.body.appendChild( renderer.view );
 
@@ -83,7 +85,7 @@ function pixiGo() {
 
 function generateChunkSprite( chunkI, chunkJ, base ) {
 	var CHUNK_SIZE = 16;
-	var TILE_SIZE = 16;
+	var TILE_SIZE = 8;
 	var chunkDOC = new PIXI.SpriteBatch();
 
 	var renderTexture = new PIXI.RenderTexture( CHUNK_SIZE * TILE_SIZE, CHUNK_SIZE * TILE_SIZE );
