@@ -2,19 +2,60 @@
 <html>
 <head>
 	<title></title>
-	<script src="libs/perlin.js"></script>
+	<script src="lib/pixi.dev.js"></script>
+	<script src="lib/xxhash.min.lmd.js"></script>
+	<script src="lib/perlin.js"></script>
 	<script src="js/generator.js"></script>
+	<script src="js/renderer.js"></script>
+	<style>
+		body,
+		html,
+		canvas {
+			width: 100%;
+			height: 100%;
+			padding: 0;
+			margin: 0;
+		}
+
+		canvas {
+			position: absolute;
+			z-index: -1;
+		}
+
+		#render-time {
+			position: absolute;
+			color: red;
+		}
+	</style>
 </head>
-<body>	
+<body>
+	<span id="render-time"></span>
 	<script type="text/javascript">
+		var stage = new PIXI.Stage(0x66FF99);
+		var width = document.body.offsetWidth;
+		var height = document.body.offsetHeight;
+		var renderer = new PIXI.autoDetectRenderer(width, height);
+		document.body.appendChild(renderer.view);
+
+		setSeed("Chris");
+
 		var start = Date.now();
-		for (var i = 0; i < 100; i++) {
-			for (var f = 0; f < 100; f++) {
-				getChunk(0,i);
-			};
-		};
+
+		var chunksToRenderX = Math.ceil(width / CHUNK_SIZE);
+		var chunksToRenderY = Math.ceil(height / CHUNK_SIZE);
+
+		for (var x = 0; x < chunksToRenderX; x++) {
+			for (var y = 0; y < chunksToRenderY; y++) {	
+				var chunk = renderChunk(x,y);
+				stage.addChild(chunk);
+			}
+		}
+
+		renderer.render(stage);
+
 		var end = Date.now();
-		document.write(( end - start ) + " ms");
+
+		 document.getElementById( 'render-time' ).innerHTML = ( end - start ) + ' ms';
 	</script>
 </body>
 </html>
