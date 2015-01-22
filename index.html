@@ -31,31 +31,12 @@
 <body>
 	<span id="render-time"></span>
 	<script type="text/javascript">
-		var stage = new PIXI.Stage(0x66FF99);
-		var width = document.body.offsetWidth;
-		var height = document.body.offsetHeight;
-		var renderer = new PIXI.autoDetectRenderer(width, height);
-		document.body.appendChild(renderer.view);
-
-		setSeed("Chris");
-
 		var start = Date.now();
 
-		var chunksToRenderX = Math.ceil(width / CHUNK_SIZE);
-		var chunksToRenderY = Math.ceil(height / CHUNK_SIZE);
-
-		for (var x = 0; x < chunksToRenderX; x++) {
-			for (var y = 0; y < chunksToRenderY; y++) {	
-				var chunk = renderChunk(x,y);
-				stage.addChild(chunk);
-			}
-		}
-
-		renderer.render(stage);
+		main();		
 
 		var end = Date.now();
-
-		 document.getElementById( 'render-time' ).innerHTML = ( end - start ) + ' ms';
+		document.getElementById( 'render-time' ).innerHTML = ( end - start ) + ' ms';
 	</script>
 </body>
 </html>
