@@ -3,7 +3,6 @@
 <head>
 	<title></title>
 	<script src="lib/pixi.dev.js"></script>
-	<script src="lib/xxhash.min.lmd.js"></script>
 	<script src="lib/perlin.js"></script>
 	<script src="js/generator.js"></script>
 	<script src="js/renderer.js"></script>
@@ -33,7 +32,7 @@
 	<script type="text/javascript">
 		var start = Date.now();
 
-		main();		
+		main();
 
 		var end = Date.now();
 		document.getElementById( 'render-time' ).innerHTML = ( end - start ) + ' ms';

@@ -1,11 +1,9 @@
-var CHUNK_SIZE = 128;
+var MAP_SIZE = 64;
 var PARAMS = {
-	OCTAVES: 8,
-	ROUGHNESS: 4,
-	SCALE: 32,
-	ROUND: 32,
-	PIXELATION: 32
+	OCTAVES: 4,
+	ROUGHNESS: 7
 };
+
 var CHUNKS = {};
 
 var _round = Math.round;
@@ -23,16 +21,18 @@ function getY( hash ) {
 }
 
 function setSeed( seed ) {
-	var H = XXH( 0xABCD );
-	noise.seed( H.update( seed ).digest() );
+	noise.seed( Math.random() * Math.random() );
+	//noise.seed( 10000 );
 }
 
 function getHeight( x, y ) {
-	//x = _round( x / PARAMS.PIXELATION ) * PARAMS.PIXELATION;
-	//y = _round( y / PARAMS.PIXELATION ) * PARAMS.PIXELATION;
+	x /= MAP_SIZE;
+	y /= MAP_SIZE;
 
-	x /= PARAMS.SCALE;
-	y /= PARAMS.SCALE;
+	var distanceX = ( 0.5 - x ) * ( 0.5 - x );
+	var distanceY = ( 0.5 - y ) * ( 0.5 - y );
+	var distanceToCenter = Math.sqrt( distanceX + distanceY );
+	distanceToCenter = 0.9 - distanceToCenter * 2;
 
 	height = 0;
 
@@ -42,17 +42,19 @@ function getHeight( x, y ) {
 		height += noise.perlin2( x * frequency, y * frequency ) * amplitude;
 	}
 
+	height = ( height / PARAMS.OCTAVES ) * 8;
+
 	height = Math.abs( height );
+	height *= distanceToCenter;
 	height *= 255;
-	height = _round( height / PARAMS.ROUND ) * PARAMS.ROUND;
 	return height;
 }
 
-function generateChunk( cX, cY ) {
+function generateMap() {
 	var chunk = [];
-	for ( var y = 0; y < CHUNK_SIZE; y++ ) {
-		for ( var x = 0; x < CHUNK_SIZE; x++ ) {
-			var height = getHeight( cX * CHUNK_SIZE + x, cY * CHUNK_SIZE + y );
+	for ( var y = 0; y < MAP_SIZE; y++ ) {
+		for ( var x = 0; x < MAP_SIZE; x++ ) {
+			var height = getHeight( x, y );
 			chunk.push( height );
 		}
 	}
@@ -63,7 +65,7 @@ function getChunk( x, y ) {
 	var hash = getHash( x, y );
 	var chunk = CHUNKS[ hash ];
 	if ( chunk == null ) {
-		chunk = generateChunk( x, y );
+		chunk = generateMap( x, y );
 		CHUNKS[ hash ] = chunk;
 	}
 	return chunk;
