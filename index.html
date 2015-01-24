@@ -8,18 +8,19 @@
 	<script src="js/renderer.js"></script>
 	<style>
 		body,
-		html {
+		html,
+		#canvas-container {
+			background: url("img/tiles/water-deep.png") repeat;
 			width: 100%;
 			height: 100%;
 			padding: 0;
 			margin: 0;
+			overflow: hidden;
 		}
-
 		canvas {
-			position: absolute;
-			z-index: -1;
+			margin: auto;
+			display: block;
 		}
-
 		#render-time {
 			position: absolute;
 			color: red;
@@ -28,6 +29,7 @@
 </head>
 <body>
 	<span id="render-time"></span>
+	<div id="canvas-container"></div>
 	<script type="text/javascript">
 		var start = Date.now();
 

@@ -1,6 +1,6 @@
-var MAP_SIZE = 64;
+var MAP_SIZE = 256;
 var PARAMS = {
-	OCTAVES: 4,
+	OCTAVES: 5,
 	ROUGHNESS: 7
 };
 

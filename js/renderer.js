@@ -2,7 +2,7 @@ function main() {
 	var viewSize = Math.min( document.body.offsetHeight, document.body.offsetWidth );
 	var stage = new PIXI.Stage( 0x66FF99 );
 	var renderer = new PIXI.autoDetectRenderer( viewSize, viewSize );
-	document.body.appendChild( renderer.view );
+	document.getElementById("canvas-container").appendChild( renderer.view );
 
 	requestAnimFrame( animate );
 
@@ -11,7 +11,7 @@ function main() {
 	stage.addChild( mapSprite );
 
 	function getMapSprite() {
-		var tileSize = 16;
+		var tileSize = 8;
 		var map = generateMap();
 		var mapSize = Math.sqrt( map.length );
 		var drawScale = viewSize / mapSize;
