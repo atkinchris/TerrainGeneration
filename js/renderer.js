@@ -1,53 +1,51 @@
 function main() {
-	var width = document.body.offsetWidth;
-	var height = document.body.offsetHeight;
+	var viewSize = Math.min( document.body.offsetHeight, document.body.offsetWidth );
 	var stage = new PIXI.Stage( 0x66FF99 );
-	var renderer = new PIXI.autoDetectRenderer( width, height );
+	var renderer = new PIXI.autoDetectRenderer( viewSize, viewSize );
 	document.body.appendChild( renderer.view );
 
 	requestAnimFrame( animate );
-	renderSomeChunks( width, height, stage );
 
-	function renderSomeChunks() {
-		setSeed( "Chris" );
-		var chunk = renderChunk( 0, 0 );
-		stage.addChild( chunk );
-	}
+	var mapSprite = getMapSprite();
 
-	function renderChunk( cX, cY ) {
+	stage.addChild( mapSprite );
+
+	function getMapSprite() {
 		var tileSize = 16;
+		var map = generateMap();
+		var mapSize = Math.sqrt( map.length );
+		var drawScale = viewSize / mapSize;
 
-		var chunk = getChunk( cX, cY );
-		var chunkSize = Math.sqrt( chunk.length );
+		var mapContainer = new PIXI.DisplayObjectContainer();
 
-		var chunkContainer = new PIXI.DisplayObjectContainer();
-		chunkContainer.position.x = cX * chunkSize;
-		chunkContainer.position.y = cY * chunkSize;
-
-		for ( var y = 0; y < chunkSize; y++ ) {
-			for ( var x = 0; x < chunkSize; x++ ) {
-				var height = chunk[ y * chunkSize + x ];
+		for ( var y = 0; y < viewSize; y += tileSize ) {
+			for ( var x = 0; x < viewSize; x += tileSize ) {
+				var mX = Math.floor( y / drawScale );
+				var mY = Math.floor( x / drawScale );
+				var height = map[ mY * mapSize + mX ];
+				var type = "";
 				if ( height <= 6 ) {
-					var tile = PIXI.Sprite.fromImage( "img/tiles/water-deep.png" );
+					type = "water-deep";
 				} else if ( height <= 24 ) {
-					var tile = PIXI.Sprite.fromImage( "img/tiles/water.png" );
+					type = "water";
 				} else if ( height <= 32 ) {
-					var tile = PIXI.Sprite.fromImage( "img/tiles/grass-light.png" );
+					type = "grass-light";
 				} else if ( height <= 64 ) {
-					var tile = PIXI.Sprite.fromImage( "img/tiles/grass.png" );
+					type = "grass";
 				} else if ( height <= 128 ) {
-					var tile = PIXI.Sprite.fromImage( "img/tiles/grass-med.png" );
+					type = "grass-med";
 				} else {
-					var tile = PIXI.Sprite.fromImage( "img/tiles/grass-dark.png" );
+					type = "grass-dark";
 				}
 
-				tile.position.x = x * tileSize;
-				tile.position.y = y * tileSize;
-				chunkContainer.addChild( tile );
+				var tile = PIXI.Sprite.fromImage( "img/tiles/" + type + ".png" );
+				tile.position.x = x;
+				tile.position.y = y;
+				mapContainer.addChild( tile );
 			}
 		}
 
-		return chunkContainer;
+		return mapContainer;
 	}
 
 	function animate() {

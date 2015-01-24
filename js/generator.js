@@ -4,25 +4,12 @@ var PARAMS = {
 	ROUGHNESS: 7
 };
 
-var CHUNKS = {};
-
-var _round = Math.round;
-
-function getHash( x, y ) {
-	return x << 16 | y;
-}
-
-function getX( hash ) {
-	return hash >> 16;
-}
-
-function getY( hash ) {
-	return hash & 0xFFFF;
-}
-
 function setSeed( seed ) {
-	noise.seed( Math.random() * Math.random() );
-	//noise.seed( 10000 );
+	if ( seed ) {
+		noise.seed( seed );
+	} else {
+		noise.seed( Math.random() * Math.random() );
+	}
 }
 
 function getHeight( x, y ) {
@@ -50,23 +37,14 @@ function getHeight( x, y ) {
 	return height;
 }
 
-function generateMap() {
-	var chunk = [];
+function generateMap( seed ) {
+	setSeed( seed );
+	var tiles = [];
 	for ( var y = 0; y < MAP_SIZE; y++ ) {
 		for ( var x = 0; x < MAP_SIZE; x++ ) {
 			var height = getHeight( x, y );
-			chunk.push( height );
+			tiles.push( height );
 		}
 	}
-	return chunk;
-}
-
-function getChunk( x, y ) {
-	var hash = getHash( x, y );
-	var chunk = CHUNKS[ hash ];
-	if ( chunk == null ) {
-		chunk = generateMap( x, y );
-		CHUNKS[ hash ] = chunk;
-	}
-	return chunk;
+	return tiles;
 }
