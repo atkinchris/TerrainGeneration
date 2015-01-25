@@ -1,6 +1,7 @@
 function main() {
 	var viewSize = Math.min( document.body.offsetHeight, document.body.offsetWidth );
-	var stage = new PIXI.Stage( 0x66FF99 );
+	var stage = new PIXI.Stage( 0x0E4189 );
+	PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
 	var renderer = new PIXI.autoDetectRenderer( viewSize, viewSize );
 	document.getElementById( "canvas-container" ).appendChild( renderer.view );
 
@@ -17,17 +18,19 @@ function main() {
 	}
 
 	function getMapSprite() {
-		var tileSize = 8;
-		var map = generateMap();
+		var tileSize = 16;
+		var zoom = 1;
+		var offset = 0;
+		var map = generateMap( 10000 );
 		var mapSize = Math.sqrt( map.length );
-		var drawScale = viewSize / mapSize;
+		var drawScale = viewSize / mapSize * zoom;
 
 		var mapContainer = new PIXI.DisplayObjectContainer();
 
 		for ( var y = 0; y < viewSize; y += tileSize ) {
 			for ( var x = 0; x < viewSize; x += tileSize ) {
-				var mX = Math.floor( y / drawScale );
-				var mY = Math.floor( x / drawScale );
+				var mX = Math.floor( ( y + offset ) / drawScale );
+				var mY = Math.floor( ( x + offset ) / drawScale );
 				var height = map[ mY * mapSize + mX ];
 				var type = "";
 				if ( height <= 6 ) {
@@ -44,9 +47,9 @@ function main() {
 					type = "grass-med";
 				} else if ( height <= 102 ) {
 					type = "grass-dark";
-				}  else if ( height <= 128 ) {
+				} else if ( height <= 128 ) {
 					type = "stone-brown";
-				}  else if ( height <= 140 ) {
+				} else if ( height <= 140 ) {
 					type = "stone-light";
 				} else {
 					type = "stone-grey";
