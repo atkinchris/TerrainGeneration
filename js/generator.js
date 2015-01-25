@@ -71,7 +71,7 @@ function getTiles( x, y, width, height ) {
 				chunk = generateChunk( chunkX, chunkY );
 				CHUNKS[ hash ] = chunk;
 			}
-			chunks.push( chunk );
+			chunks.push.apply( chunks, chunk );
 		}
 	}
 
