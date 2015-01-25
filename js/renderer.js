@@ -2,13 +2,19 @@ function main() {
 	var viewSize = Math.min( document.body.offsetHeight, document.body.offsetWidth );
 	var stage = new PIXI.Stage( 0x66FF99 );
 	var renderer = new PIXI.autoDetectRenderer( viewSize, viewSize );
-	document.getElementById("canvas-container").appendChild( renderer.view );
+	document.getElementById( "canvas-container" ).appendChild( renderer.view );
 
-	requestAnimFrame( animate );
+	// create an array of assets to load
+	var assetsToLoader = [ "img/tileset.json" ];
+	loader = new PIXI.AssetLoader( assetsToLoader );
+	loader.onComplete = onAssetsLoaded
+	loader.load();
 
-	var mapSprite = getMapSprite();
-
-	stage.addChild( mapSprite );
+	function onAssetsLoaded() {
+		var mapSprite = getMapSprite();
+		stage.addChild( mapSprite );
+		requestAnimFrame( animate );
+	}
 
 	function getMapSprite() {
 		var tileSize = 8;
@@ -29,16 +35,24 @@ function main() {
 				} else if ( height <= 24 ) {
 					type = "water";
 				} else if ( height <= 32 ) {
+					type = "sand";
+				} else if ( height <= 38 ) {
 					type = "grass-light";
-				} else if ( height <= 64 ) {
+				} else if ( height <= 50 ) {
 					type = "grass";
-				} else if ( height <= 128 ) {
+				} else if ( height <= 96 ) {
 					type = "grass-med";
-				} else {
+				} else if ( height <= 102 ) {
 					type = "grass-dark";
+				}  else if ( height <= 128 ) {
+					type = "stone-brown";
+				}  else if ( height <= 140 ) {
+					type = "stone-light";
+				} else {
+					type = "stone-grey";
 				}
 
-				var tile = PIXI.Sprite.fromImage( "img/tiles/" + type + ".png" );
+				var tile = PIXI.Sprite.fromImage( type + ".png" );
 				tile.position.x = x;
 				tile.position.y = y;
 				mapContainer.addChild( tile );

@@ -12,6 +12,10 @@ function setSeed( seed ) {
 	}
 }
 
+function rngRange( min, max ) {
+	return Math.random() * ( max - min ) + min;
+}
+
 function getHeight( x, y ) {
 	x /= MAP_SIZE;
 	y /= MAP_SIZE;
