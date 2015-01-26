@@ -14,7 +14,8 @@ function main() {
 	function onAssetsLoaded() {
 		var mapSprite = getMapSprite();
 		stage.addChild( mapSprite );
-		requestAnimFrame( animate );
+		//requestAnimFrame( animate );
+		renderer.render( stage );
 	}
 
 	function getMapSprite() {
@@ -31,8 +32,8 @@ function main() {
 		width = ( Math.ceil( width / CHUNK_SIZE ) + 1 ) * CHUNK_SIZE;
 		height = ( Math.ceil( height / CHUNK_SIZE ) + 1 ) * CHUNK_SIZE;
 
-		mapWidth = map[ 0 ].length;
-		mapHeight = map.length;
+		mapWidth = map[ 0 ].length - 1;
+		mapHeight = map.length - 1;
 
 		for ( var y = 0; y < height; y++ ) {
 			for ( var x = 0; x < width; x++ ) {
