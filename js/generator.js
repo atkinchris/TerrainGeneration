@@ -1,5 +1,5 @@
 var CHUNK_SIZE = 32;
-var MAP_SIZE = CHUNK_SIZE * 16;
+var MAP_SIZE = CHUNK_SIZE * 32;
 var PARAMS = {
 	OCTAVES: 5,
 	ROUGHNESS: 7
@@ -54,13 +54,18 @@ function getHeight( x, y ) {
 }
 
 function getTiles( x, y, width, height ) {
+	setSeed( 10000 );
 	var cX = Math.floor( x / CHUNK_SIZE );
-	var cWidth = Math.ceil( width / CHUNK_SIZE );
+	var cWidth = Math.ceil( width / CHUNK_SIZE ) + 1;
 
 	var cY = Math.floor( y / CHUNK_SIZE );
-	var cHeight = Math.ceil( height / CHUNK_SIZE );
+	var cHeight = Math.ceil( height / CHUNK_SIZE ) + 1;
 
-	var chunks = [];
+	var tiles = new Array( ( cHeight + 1 ) * CHUNK_SIZE );
+	for ( var i = 0; i < tiles.length; i++ ) {
+		tiles[ i ] = new Array( ( cWidth + 1 ) * CHUNK_SIZE );
+	}
+
 	for ( var iY = 0; iY < cHeight; iY++ ) {
 		for ( var iX = 0; iX < cWidth; iX++ ) {
 			var chunkX = cX + iX;
@@ -71,11 +76,17 @@ function getTiles( x, y, width, height ) {
 				chunk = generateChunk( chunkX, chunkY );
 				CHUNKS[ hash ] = chunk;
 			}
-			chunks.push.apply( chunks, chunk );
+
+			for ( var y = 0; y < CHUNK_SIZE; y++ ) {
+				for ( var x = 0; x < CHUNK_SIZE; x++ ) {
+					var height = chunk[ y * CHUNK_SIZE + x ];
+					tiles[ iY * CHUNK_SIZE + y ][ iX * CHUNK_SIZE + x ] = height;
+				}
+			}
 		}
 	}
 
-	return chunks;
+	return tiles;
 }
 
 function generateChunk( cX, cY ) {
@@ -83,7 +94,7 @@ function generateChunk( cX, cY ) {
 
 	for ( var y = 0; y < CHUNK_SIZE; y++ ) {
 		for ( var x = 0; x < CHUNK_SIZE; x++ ) {
-			var height = getHeight( x, y );
+			var height = getHeight( cX * CHUNK_SIZE + x, cY * CHUNK_SIZE + y );
 			tiles.push( height );
 		}
 	}

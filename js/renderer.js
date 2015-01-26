@@ -1,8 +1,8 @@
 function main() {
-	var viewSize = Math.min( document.body.offsetHeight, document.body.offsetWidth );
-	var stage = new PIXI.Stage( 0x0E4189 );
+	var viewSize = Math.min( document.body.offsetWidth, document.body.offsetHeight );
+	var stage = new PIXI.Stage( 0xFF4189 );
 	PIXI.scaleModes.DEFAULT = PIXI.scaleModes.NEAREST;
-	var renderer = new PIXI.autoDetectRenderer( viewSize, viewSize );
+	var renderer = new PIXI.autoDetectRenderer( 800, 800 );
 	document.getElementById( "canvas-container" ).appendChild( renderer.view );
 
 	// create an array of assets to load
@@ -19,48 +19,59 @@ function main() {
 
 	function getMapSprite() {
 		var tileSize = 16;
-		var zoom = 1;
-		var offset = 0;
-		var map = generateMap( 10000 );
-		var mapSize = Math.sqrt( map.length );
-		var drawScale = viewSize / mapSize * zoom;
+		var offsetX = 0;
+		var offsetY = 0;
+		var zoom = 20;
+		var width = Math.ceil( 800 / tileSize );
+		var height = Math.ceil( 800 / tileSize );
 
+		var map = getTiles( offsetX, offsetY, width * zoom, height * zoom );
 		var mapContainer = new PIXI.DisplayObjectContainer();
 
-		for ( var y = 0; y < viewSize; y += tileSize ) {
-			for ( var x = 0; x < viewSize; x += tileSize ) {
-				var mX = Math.floor( ( y + offset ) / drawScale );
-				var mY = Math.floor( ( x + offset ) / drawScale );
-				var height = map[ mY * mapSize + mX ];
+		width = ( Math.ceil( width / CHUNK_SIZE ) + 1 ) * CHUNK_SIZE;
+		height = ( Math.ceil( height / CHUNK_SIZE ) + 1 ) * CHUNK_SIZE;
+
+		mapWidth = map[ 0 ].length;
+		mapHeight = map.length;
+
+		for ( var y = 0; y < height; y++ ) {
+			for ( var x = 0; x < width; x++ ) {
+				if ( x * zoom > mapWidth || y * zoom > mapHeight ) {
+					continue;
+				}
+				var altitude = map[ x * zoom ][ y * zoom ];
 				var type = "";
-				if ( height <= 6 ) {
+				if ( altitude <= 6 ) {
 					type = "water-deep";
-				} else if ( height <= 24 ) {
+				} else if ( altitude <= 24 ) {
 					type = "water";
-				} else if ( height <= 32 ) {
+				} else if ( altitude <= 32 ) {
 					type = "sand";
-				} else if ( height <= 38 ) {
+				} else if ( altitude <= 38 ) {
 					type = "grass-light";
-				} else if ( height <= 50 ) {
+				} else if ( altitude <= 50 ) {
 					type = "grass";
-				} else if ( height <= 96 ) {
+				} else if ( altitude <= 96 ) {
 					type = "grass-med";
-				} else if ( height <= 102 ) {
+				} else if ( altitude <= 102 ) {
 					type = "grass-dark";
-				} else if ( height <= 128 ) {
+				} else if ( altitude <= 128 ) {
 					type = "stone-brown";
-				} else if ( height <= 140 ) {
+				} else if ( altitude <= 140 ) {
 					type = "stone-light";
 				} else {
 					type = "stone-grey";
 				}
 
 				var tile = PIXI.Sprite.fromImage( type + ".png" );
-				tile.position.x = x;
-				tile.position.y = y;
+				tile.position.x = x * tileSize;
+				tile.position.y = y * tileSize;
 				mapContainer.addChild( tile );
 			}
 		}
+
+		mapContainer.position.x -= (offsetX % CHUNK_SIZE) * tileSize;
+		mapContainer.position.y -= (offsetY % CHUNK_SIZE) * tileSize;
 
 		return mapContainer;
 	}
