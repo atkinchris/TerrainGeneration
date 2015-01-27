@@ -55,10 +55,10 @@ function getChunks( x, y, width, height, zoom ) {
 
 	var padding = 1;
 
-	var cX = Math.floor( x / CHUNK_SIZE ) - padding;
+	var cX = Math.max( Math.floor( x / CHUNK_SIZE ) - padding, 0 );
 	var cWidth = Math.ceil( width / CHUNK_SIZE ) + padding + 1;
 
-	var cY = Math.floor( y / CHUNK_SIZE ) - padding;
+	var cY = Math.max( Math.floor( y / CHUNK_SIZE ) - padding, 0 );
 	var cHeight = Math.ceil( height / CHUNK_SIZE ) + padding + 1;
 
 	var chunks = [];
