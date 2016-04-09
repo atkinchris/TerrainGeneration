@@ -1,42 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Islands</title>
-	<script src="lib/pixi.dev.js"></script>
-	<script src="lib/perlin.js"></script>
-	<script src="js/generator.js"></script>
-	<script src="js/renderer.js"></script>
-	<style>
-		body,
-		html,
-		#canvas-container {
-			background: #0E4189 repeat;
-			width: 100%;
-			height: 100%;
-			padding: 0;
-			margin: 0;
-			overflow: hidden;
-		}
-		canvas {
-			margin: auto;
-			display: block;
-		}
-		#render-time {
-			position: absolute;
-			color: red;
-		}
-	</style>
+	<title>Terrain Generation</title>
 </head>
 <body>
-	<span id="render-time"></span>
 	<div id="canvas-container"></div>
-	<script type="text/javascript">
-		var start = Date.now();
-
-		main();
-
-		var end = Date.now();
-		document.getElementById( 'render-time' ).innerHTML = ( end - start ) + ' ms';
-	</script>
+	<script src="bundle.js" charset="utf-8"></script>
 </body>
 </html>

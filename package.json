@@ -1,0 +1,27 @@
+{
+  "name": "terrain-generation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify src/app.js --standalone terrain-generation > bundle.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atkinchris/terrain-generation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atkinchris/terrain-generation/issues"
+  },
+  "homepage": "https://github.com/atkinchris/terrain-generation#readme",
+  "dependencies": {
+    "pixi.js": "^3.0.11"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.0"
+  }
+}
